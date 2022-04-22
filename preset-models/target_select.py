@@ -1,45 +1,37 @@
 #!/usr/bin/python3
 
 import sys
-import shutil
-import fileinput
 
-main_targets = ["mi-router-4a-gigabit","mi-router-cr6608","redmi-router-ac2100","phicomm_k2p"]
-main_numbers = ["1","2","3","4"]
-sub_targets = ["mi-router-cr6606","mi-router-cr6609","mi-router-3g","mi-router-4","mi-router-3-pro","mi-router-ac2100","mi-router-3g-v2"]
-sub_numbers = ["2-1","2-2","2-3","2-4","2-5","3-1","1-1"]
+t_head1 = ["CONFIG_TARGET_ramips=y", "CONFIG_TARGET_ramips_mt7621=y"]
+t_head2 = ["CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-4a-gigabit=y",
+	"CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-3g-v2=y",
+	"CONFIG_TARGET_ramips_mt7621_DEVICE_phicomm_k2p=y",
+	"CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-ac2100=y",
+	"CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_redmi-router-ac2100=y",
+	"CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-cr6606=y",
+	"CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-cr6608=y",
+	"CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-cr6609=y",
+	"CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-3g=y",
+	"CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-4=y",
+	"CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-3-pro=y"]
+# 1.config为小闪存机型配置，2.config为大闪存机型配置
+conf_files = ["preset-models/1.config", "preset-models/2.config"]
 
-def get_number():
-    i = 1
-    for target in main_targets:
-        if target == sys.argv[1]:
-            return i
-            break
-        i += 1
-    else:
-        j = 0
-        for target in sub_targets:
-            if target == sys.argv[1]:
-                return sub_numbers[j]
-                break
-            j += 1
+m = t_head2.index("CONFIG_TARGET_ramips_mt7621_DEVICE_" + sys.argv[1] + "=y")
 
-def copy_files(old_num,new_num,old_str,new_str):
-    config_files = [".config","clone.sh","modify.sh"]
-    for config_file in config_files:
-        shutil.copyfile(old_num + config_file,new_num + config_file)
-    for line in fileinput.input(new_num + config_files[0], inplace=1):
-        line = line.replace(old_str,new_str)
-        print(line, end = "")
-    return
+if m < 3:
+	n = 0
+else:
+	n =1
 
-temp_num = get_number()
+with open(conf_files[n]) as orig_conf, open(".config", "w") as co_conf:
+	for t in t_head1:
+		co_conf.write(t + "\n")
+	co_conf.write(t_head2[m] + "\n\n")
+	co_conf.writelines(orig_conf.readlines())
 
-print(temp_num)
+if m == 0 or m == 1:
+	with open("preset-models/modify.sh", "a") as f_orig:
+		f_orig.write(". extra-files/mi-router-4a-3g-v2.sh\n")
 
-#复制子机型配置文件
-if isinstance(temp_num,str):
-    pre_num = temp_num.split("-")[0]
-    m = main_numbers.index(pre_num)
-    n = sub_numbers.index(temp_num)
-    copy_files(pre_num,temp_num,main_targets[m],sub_targets[n])
+print(m + 1)

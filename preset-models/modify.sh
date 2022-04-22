@@ -1,8 +1,8 @@
 #!/bin/sh
 #修改登录IP
-sed -i 's/192.168.1.1/192.168.10.1/g' package/base-files/files/bin/config_generate
+sed -i 's/192.168.1.1/192.168.31.1/g' package/base-files/files/bin/config_generate
 #修改主机名
-sed -i 's/OpenWrt/MiWiFi-CR6608/g' package/base-files/files/bin/config_generate
+sed -i 's/OpenWrt/Xiaomi-Router/g' package/base-files/files/bin/config_generate
 #删除自带低版本xray-core
 rm -rf feeds/packages/net/xray-core
 rm -rf package/feeds/packages/xray-core
@@ -19,6 +19,7 @@ cp -f uci-scripts/* files/etc/uci-defaults
 #sed -i '/root/croot:$1$CBd7u73H$LvSDVXLBrzpk4JfuuN.Lv1:18676:0:99999:7:::' package/base-files/files/etc/shadow
 #切换ramips内核到5.15
 #sed -i '/KERNEL_PATCHVER/cKERNEL_PATCHVER:=5.15' target/linux/ramips/Makefile
+
 #删除一些zzz中的脚本
 sed -i '/DISTRIB_/d' package/default-settings/files/zzz-default-settings
 sed -i '/footer.htm/d' package/default-settings/files/zzz-default-settings
