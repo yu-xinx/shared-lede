@@ -83,7 +83,7 @@ jobs:
           NUMBER=$(python3 preset-models/target_select.py ${{ github.event.inputs.model }})
           echo "RELEASE_TITLE=$(jq -r .model_$NUMBER.en_title preset-models/release_content.json)" >> $GITHUB_ENV
           echo "KEY_INFO<<EOF" >> $GITHUB_ENV
-          jq -r .model_$NUMBER.zh_title,.model_$NUMBER.source,.model_$NUMBER.login_info,.model_$NUMBER.applications preset-models/release_content.json
+          jq -r .model_$NUMBER.zh_title,.model_$NUMBER.source,.model_$NUMBER.login_info,.model_$NUMBER.applications preset-models/release_content.json >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
       - name: 下载源码与插件
         run: |
