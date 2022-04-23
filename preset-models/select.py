@@ -14,6 +14,7 @@ t_head2 = ["CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-4a-gigabit=y",
 	"CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-3g=y",
 	"CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-4=y",
 	"CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-3-pro=y"]
+
 # 1.config为小闪存机型配置，2.config为大闪存机型配置
 conf_files = ["preset-models/1.config", "preset-models/2.config"]
 

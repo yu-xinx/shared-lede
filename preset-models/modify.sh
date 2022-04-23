@@ -19,7 +19,6 @@ cp -f uci-scripts/* files/etc/uci-defaults
 #sed -i '/root/croot:$1$CBd7u73H$LvSDVXLBrzpk4JfuuN.Lv1:18676:0:99999:7:::' package/base-files/files/etc/shadow
 #切换ramips内核到5.15
 #sed -i '/KERNEL_PATCHVER/cKERNEL_PATCHVER:=5.15' target/linux/ramips/Makefile
-
 #删除一些zzz中的脚本
 sed -i '/DISTRIB_/d' package/default-settings/files/zzz-default-settings
 sed -i '/footer.htm/d' package/default-settings/files/zzz-default-settings

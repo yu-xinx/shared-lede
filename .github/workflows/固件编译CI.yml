@@ -47,6 +47,11 @@ on:
         required: false
         default: 'false'
         type: boolean
+      unblockmusic:
+        description: '网易云音乐解锁'
+        required: false
+        default: 'false'
+        type: boolean
       release:
         description: '上传到release'
         required: false
@@ -60,6 +65,10 @@ on:
 env:
   CLONE_SH: preset-models/clone.sh
   MODIFY_SH: preset-models/modify.sh
+  SELECT_PY: preset-models/select.py
+  RELEASE_JSON: preset-models/release.json
+  PHICOMM_MOD_PATCH: extra-files/phicomm_mod.patch
+  UNBLOCKMUSIC_SH: extra-files/unblockmusic.sh
 jobs:
   build_openwrt:
     name: 固件编译
@@ -80,10 +89,10 @@ jobs:
       - name: 机型选择
         run: |
           echo "你选择了：${{ github.event.inputs.model }}"
-          NUMBER=$(python3 preset-models/target_select.py ${{ github.event.inputs.model }})
-          echo "RELEASE_TITLE=$(jq -r .model_$NUMBER.en_title preset-models/release_content.json)" >> $GITHUB_ENV
-          echo "KEY_INFO<<EOF" >> $GITHUB_ENV
-          jq -r .model_$NUMBER.zh_title,.model_$NUMBER.source,.model_$NUMBER.login_info,.model_$NUMBER.applications preset-models/release_content.json >> $GITHUB_ENV
+          NUMBER=$(python3 $SELECT_PY ${{ github.event.inputs.model }})
+          echo "RELEASE_TITLE=$(jq -r .model_$NUMBER.title $RELEASE_JSON)" >> $GITHUB_ENV
+          echo "BODY_CONTENT<<EOF" >> $GITHUB_ENV
+          jq -r .model_$NUMBER.body[] $RELEASE_JSON >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
       - name: 下载源码与插件
         run: |
@@ -95,8 +104,10 @@ jobs:
           ./scripts/feeds install -a
       - name: 修改配置
         run: |
-          [ ${{ github.event.inputs.cpu_overclock }} == true ] && sed -i '/322-mt7621-fix-cpu-clk-add-clkdev.patch/ s/#//' $MODIFY_SH
-          [ ${{ github.event.inputs.kernel_5_15 }} == true ] && sed -i '/KERNEL_PATCHVER:=5.15/ s/#//' $MODIFY_SH
+          [ ${{ github.event.inputs.cpu_overclock }} == 'true' ] && sed -i '/fix-cpu-clk/ s/#//' $MODIFY_SH
+          [ ${{ github.event.inputs.kernel_5_15 }} == 'true' ] && sed -i '/KERNEL_PATCHVER:=5.15/ s/#//' $MODIFY_SH
+          [ ${{ github.event.inputs.model }} == 'phicomm_k2p'] && patch -p1 < $PHICOMM_MOD_PATCH
+          [ ${{ github.event.inputs.unblockmusic }} == 'true' ] && chmod +x $UNBLOCKMUSIC_SH && $UNBLOCKMUSIC_SH
           chmod +x $MODIFY_SH
           $MODIFY_SH
       - name: Make defconfig
@@ -144,7 +155,7 @@ jobs:
           release_name: "${{ env.RELEASE_PRE }} ${{ env.RELEASE_TITLE }}" 
           overwrite: true
           prerelease: false
-          body: "${{ env.KEY_INFO }}<br/>${{ github.event.inputs.version_description }}"
+          body: "${{ env.BODY_CONTENT }}<br/>${{ github.event.inputs.version_description }}"
           file_glob: true
         env:
           RELEASE_FIRMWARE_VALUE: ${{ secrets.RELEASE_FIRMWARE }}
