@@ -27,3 +27,7 @@ cp -f uci-scripts/* files/etc/uci-defaults
 sed -i '/DISTRIB_/d' package/default-settings/files/zzz-default-settings
 sed -i '/footer.htm/d' package/default-settings/files/zzz-default-settings
 sed -i '/admin_status/d' package/default-settings/files/zzz-default-settings
+
+# Add a feed source 额外添加feed源
+#sed -i '$a src-git lienol https://github.com/Lienol/openwrt-package' feeds.conf.default
+sed -i '$a src-git diy https://github.com/CCnut/feed-netkeeper.git;LUCI-LUA-UCITRACK' feeds.conf.default
